@@ -1,5 +1,6 @@
 # Task-Prioritiser
 Task-Sensi implementation using bfs/dfs and A* algorithm
+
 ✨ Key Features
 1. Dependency Management: Models tasks and their prerequisites as a Directed Acyclic Graph (DAG) to ensure a valid workflow.
 2. Dynamic Priority Scoring: Calculates a task's priority based on user-defined Importance, upcoming Deadlines (Urgency), and estimated Effort.
