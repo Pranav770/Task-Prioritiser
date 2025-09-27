@@ -1,0 +1,21 @@
+*{
+    padding: 0%;
+    margin: 0%;
+}
+body{
+    background-image: url(bg_grid.jpg);
+    background-repeat: repeat;
+    background-size: 100%;
+    font-family: VT323;
+    
+}
+#title{
+    color: #ce8a17;
+    text-align: center;
+    font-size: 150px;
+}
+#Sub_title{
+    color: white;
+    font-size: 50px;
+      
+}
