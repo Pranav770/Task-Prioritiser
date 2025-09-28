@@ -3,20 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UI</title>
+    <title>Task Prioritiser</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
-    <nav id = "nav"></nav>
     <h1 id="title">Task Prioritiser</h1>
-    <div id="inpt">
-    <h2 id="Sub_title">Enter Your Task Here:</h2>
+    <div id="container">
+        <!-- Left side: Input -->
+        <div id="input-section">
+            <h2 id="Sub_title">Enter Your Task:</h2>
+            <input type="text" id="taskInput" placeholder="Write a task...">
+            <button id="addBtn">Add Task</button>
+        </div>
 
+        <!-- Right side: Output -->
+        <div id="output-section">
+            <h2 id="Sub_title">Your Tasks:</h2>
+            <ul id="taskList"></ul>
+        </div>
     </div>
-
+<script src="script.js"></script>
+    
 </body>
 </html>
