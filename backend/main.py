@@ -2,10 +2,19 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import json
 import os
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# Pydantic model for input validation
+# Enable CORS so frontend can call backend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://127.0.0.1:3000"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 class Task(BaseModel):
     task: str
 
@@ -25,6 +34,10 @@ def save_tasks(tasks):
 @app.post("/add_task")
 def add_task(task: Task):
     tasks = load_tasks()
-    tasks.append(task.model_dump())  # append new task
+    tasks.append(task.dict())
     save_tasks(tasks)
     return {"message": "Task added successfully"}
+
+@app.get("/tasks")
+def get_tasks():
+    return load_tasks()
