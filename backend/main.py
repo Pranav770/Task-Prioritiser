@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 import json
 import os
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,6 +17,7 @@ app.add_middleware(
 
 class Task(BaseModel):
     task: str
+    priority: int = Field(..., ge=1, le=10)
 
 # File path
 FILE_PATH = "tasks.json"
@@ -32,7 +33,7 @@ def save_tasks(tasks):
         json.dump(tasks, f, indent=4)
 
 @app.post("/add_task")
-def add_task(task: Task):
+def add_task(task: Task,):
     tasks = load_tasks()
     tasks.append(task.dict())
     save_tasks(tasks)

@@ -1,4 +1,5 @@
-const taskInput = document.getElementById("taskInput");
+const taskInput1 = document.getElementById("taskInput1");
+const taskInput2 = document.getElementById("taskInput2");
 const addBtn = document.getElementById("addBtn");
 const taskList = document.getElementById("taskList");
 
@@ -10,29 +11,43 @@ function renderTasks(tasks) {
     taskList.innerHTML = "";
     tasks.forEach(t => {
         const li = document.createElement("li");
-        li.textContent = t.task;  // each task is {"task": "..."}
+        li.textContent = `${t.task} (Priority: ${t.priority})`;
         taskList.appendChild(li);
     });
 }
 
 // Fetch tasks from backend on page load
 async function loadTasks() {
-    const res = await fetch(`${API_URL}/tasks`);
-    const tasks = await res.json();
-    renderTasks(tasks);
+    try {
+        const res = await fetch(`${API_URL}/tasks`);
+        if (!res.ok) throw new Error("Failed to fetch tasks");
+        const tasks = await res.json();
+        renderTasks(tasks);
+    } catch (err) {
+        console.error(err);
+        taskList.innerHTML = "<li>Error loading tasks</li>";
+    }
 }
 
-// Add task (send to backend)
+// Add task and render immediately
 addBtn.addEventListener("click", async () => {
-    const task = taskInput.value.trim();
-    if (task !== "") {
-        await fetch(`${API_URL}/add_task`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ task: task })
-        });
-        taskInput.value = "";
-        loadTasks(); // refresh task list
+    const task1 = taskInput1.value.trim();
+    let task2 = parseInt(taskInput2.value.trim()) || 1;
+    task2 = Math.min(Math.max(task2, 1), 10); // ensure 1-10
+    if (task1 !== "") {
+        try {
+            const res = await fetch(`${API_URL}/add_task`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ task: task1, priority: task2 })
+            });
+            const data = await res.json();
+            renderTasks(data.tasks); // immediately update UI
+            taskInput1.value = "";
+            taskInput2.value = "";
+        } catch (err) {
+            console.error(err);
+        }
     }
 });
 

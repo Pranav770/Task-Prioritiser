@@ -1,8 +1,14 @@
 [
     {
-        "task": "SriRam"
+        "task": "DSA",
+        "priority": 9
     },
     {
-        "task": "DSA"
+        "task": "MFC",
+        "priority": 10
+    },
+    {
+        "task": "JAVA",
+        "priority": 8
     }
 ]
