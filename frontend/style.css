@@ -54,6 +54,30 @@ body {
     border-radius: 8px;
     margin-bottom: 10px;
 }
+#taskInput3 {
+    width: 80%;
+    padding: 10px;
+    font-size: 20px;
+    border: none;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+#taskInput4 {
+    width: 80%;
+    padding: 10px;
+    font-size: 20px;
+    border: none;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+#taskInput5 {
+    width: 80%;
+    padding: 10px;
+    font-size: 20px;
+    border: none;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
 
 #addBtn {
     padding: 10px 20px;
@@ -80,3 +104,36 @@ body {
     margin: 8px 0;
     color: #cecece;
 }
+/* Task list items */
+#taskList li {
+    margin: 10px 0;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Task text */
+#taskList li span {
+    color: #cecece;
+    font-size: 22px;
+}
+
+/* Remove button */
+.removeBtn {
+    margin-left: 15px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    color: red;
+    font-size: 22px;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.removeBtn:hover {
+    color: darkred;
+    transform: scale(1.3);
+}
+

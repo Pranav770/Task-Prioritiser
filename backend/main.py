@@ -18,6 +18,8 @@ app.add_middleware(
 class Task(BaseModel):
     task: str
     priority: int = Field(..., ge=1, le=10)
+    DueDate: str = None       
+    dependency: str = None    
 
 # File path
 FILE_PATH = "tasks.json"
@@ -37,8 +39,21 @@ def add_task(task: Task,):
     tasks = load_tasks()
     tasks.append(task.dict())
     save_tasks(tasks)
-    return {"message": "Task added successfully"}
+    return {"tasks": tasks}
 
 @app.get("/tasks")
 def get_tasks():
     return load_tasks()
+
+@app.post("/delete_task")
+def delete_task(data: dict):
+    task_name = data.get("task")
+    if not task_name:
+        return {"error": "Task name is required"}
+
+    tasks = load_tasks()
+    # Remove all tasks that match this name
+    updated_tasks = [t for t in tasks if t["task"] != task_name]
+    save_tasks(updated_tasks)
+
+    return {"tasks": updated_tasks}

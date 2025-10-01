@@ -1,48 +1,62 @@
-from collections import deque
+from datetime import datetime
+from collections import deque, defaultdict
 
-# We mainly take input graph as a set of edges. This function is
-# mainly a utility function to convert the edges to an adjacency
-# list
-def constructadj(V, edges):
-    adj = [[] for _ in range(V)]
-    for u, v in edges:
-        adj[u].append(v)
-    return adj
-
-# Function to return list containing vertices in Topological order
-def topologicalSort(V, edges):
-    adj = constructadj(V, edges)
-    indegree = [0] * V
-
-    # Calculate indegree of each vertex
-    for u in range(V):
-        for v in adj[u]:
-            indegree[v] += 1
-
-    # Queue to store vertices with indegree 0
-    q = deque([i for i in range(V) if indegree[i] == 0])
+def run_hybrid_prioritization(tasks):
+    """
+    Hybrid task prioritization using BFS-based topological sort (Kahn's Algorithm).
     
+    Steps:
+    1. Build in-degree map and adjacency list (task dependencies).
+    2. Initialize a queue with tasks having no prerequisites.
+    3. Process tasks in BFS order:
+        - At each step, choose the highest scoring task from the current queue.
+        - Append it to the result.
+        - Reduce the in-degree of its neighbors.
+        - If any neighbor's in-degree hits 0, enqueue it.
+    4. Return the prioritized task order.
+    """
+
+    # Map task_id -> task dictionary
+    task_map = {task["id"]: task for task in tasks}
+
+    # Build graph and in-degree map
+    in_degree = {task["id"]: 0 for task in tasks}
+    graph = defaultdict(list)
+
+    for task in tasks:
+        for prereq in task["prerequisites"]:
+            graph[prereq].append(task["id"])
+            in_degree[task["id"]] += 1
+
+    # Function to compute hybrid score
+    def compute_score(task):
+        importance = task["importance"]
+        due_date = datetime.strptime(task["due_date"], "%Y-%m-%d").date()
+        today = datetime.today().date()
+        days_until_due = max((due_date - today).days, 0)  # no negatives
+        return (importance * 10) + (100 - days_until_due)
+
+    # Initialize BFS queue with tasks having no prerequisites
+    queue = deque([tid for tid, deg in in_degree.items() if deg == 0])
     result = []
-    while q:
-        node = q.popleft()
-        result.append(node)
 
-        for neighbor in adj[node]:
-            indegree[neighbor] -= 1
-            if indegree[neighbor] == 0:
-                q.append(neighbor)
+    while queue:
+        # Get all available tasks in the current "frontier"
+        current_level = [task_map[tid] for tid in list(queue)]
+        queue.clear()
 
-    # Check for cycle
-    if len(result) != V:
-        print("Graph contains cycle!")
-        return []
+        # Pick the task with the highest score
+        best_task = max(current_level, key=compute_score)
+        result.append(best_task)
+
+        # Process only the chosen best task
+        for neighbor in graph[best_task["id"]]:
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                queue.append(neighbor)
+
+    # Optional: cycle detection (if not all tasks are processed)
+    if len(result) != len(tasks):
+        raise ValueError("Cycle detected in task dependencies!")
 
     return result
-
-if __name__ == "__main__":
-    V = 6
-    edges = [[0, 1], [1, 2], [2, 3], [4, 5], [5, 1], [5, 2]]
-
-    result = topologicalSort(V, edges)
-    if result:
-        print("Topological Order:", result)

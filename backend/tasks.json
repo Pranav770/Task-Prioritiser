@@ -1,14 +1,1 @@
-[
-    {
-        "task": "DSA",
-        "priority": 9
-    },
-    {
-        "task": "MFC",
-        "priority": 10
-    },
-    {
-        "task": "JAVA",
-        "priority": 8
-    }
-]
+[]
