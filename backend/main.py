@@ -34,10 +34,21 @@ def save_tasks(tasks):
     with open(FILE_PATH, "w") as f:
         json.dump(tasks, f, indent=4)
 
+# Helper: generate new ID like T1, T2, T3...
+def generate_task_id(tasks):
+    if not tasks:
+        return "T1"
+    last_id = tasks[-1].get("id", "T0")  # fallback if id missing
+    last_num = int(last_id[1:])  # extract number from "T5" -> 5
+    return f"T{last_num + 1}"
+
 @app.post("/add_task")
 def add_task(task: Task,):
     tasks = load_tasks()
-    tasks.append(task.dict())
+    new_id = generate_task_id(tasks)
+    task_data = task.dict()
+    task_data["id"] = new_id
+    tasks.append(task_data)
     save_tasks(tasks)
     return {"tasks": tasks}
 
