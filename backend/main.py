@@ -76,3 +76,19 @@ def get_sorted_tasks():
     sorted_tasks = run_topological_sort(tasks)
 
     return {"tasks": sorted_tasks}
+
+@app.post("/update_dependencies")
+def update_dependencies(data: dict):
+    updates = data.get("updates", [])
+    if not updates:
+        return {"error": "No updates provided"}
+
+    tasks = load_tasks()
+    # For each update, find the task by id and set its dependency
+    for u in updates:
+        for task in tasks:
+            if task["id"] == u["id"]:
+                task["dependency"] = u.get("dependency")  # can be None
+
+    save_tasks(tasks)
+    return {"tasks": tasks}

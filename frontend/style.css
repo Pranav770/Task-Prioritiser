@@ -154,4 +154,72 @@ input[type="text"], input[type="number"], input[type="date"] {
     transition: background 0.2s ease, transform 0.2s ease;
 }
 
+/* dependency.css */
+
+/* Container for dependency section */
+#dependency-section {
+    background: rgba(0, 0, 0, 0.75);
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 15px;
+    width: 85%;
+    min-width: 300px;
+    text-align: left;
+    box-shadow: 0px 0px 12px rgba(206, 138, 23, 0.5);
+}
+
+/* Subtitle for dependency section */
+#dependency-section h2#Sub_title {
+    font-size: 36px;
+    color: #ffd369;
+    margin-bottom: 15px;
+    text-shadow: 0px 0px 6px #ce8a17;
+}
+
+/* Each dependency row */
+#dependency-section div {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+/* Label for task dependency */
+#dependency-section label {
+    font-size: 20px;
+    color: #fff5d6;
+    width: 180px;
+}
+
+/* Dropdown for dependency selection */
+#dependency-section select {
+    padding: 8px 12px;
+    font-size: 18px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    min-width: 150px;
+}
+
+/* Save Dependencies button */
+#saveDependencies {
+    margin-top: 10px;
+    font-size: 20px;
+    padding: 10px 20px;
+    background-color: #ffd369;
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+/* Optional: hover effect for save button (light) */
+#saveDependencies:hover {
+    background-color: #e1a23c;
+    color: #000;
+}
 

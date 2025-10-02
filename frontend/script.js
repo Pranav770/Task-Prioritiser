@@ -1,7 +1,6 @@
 const taskInput1 = document.getElementById("taskInput1");
 const taskInput2 = document.getElementById("taskInput2");
 const taskInput3 = document.getElementById("taskInput3");
-const taskInput4 = document.getElementById("taskInput4");
 const addBtn = document.getElementById("addBtn");
 const taskList = document.getElementById("taskList");
 const sortedTaskList = document.getElementById("sortedTaskList"); // new sorted output
@@ -112,6 +111,61 @@ addBtn.addEventListener("click", async () => {
         } catch (err) {
             console.error(err);
         }
+    }
+});
+
+// Render dependency dropdowns for each task
+async function renderDependencyOptions(tasks) {
+    dependencyContainer.innerHTML = "";
+    tasks.forEach(task => {
+        const div = document.createElement("div");
+        div.style.marginBottom = "10px";
+        div.innerHTML = `
+            <label>${task.id} depends on:</label>
+            <select data-task-id="${task.id}">
+                <option value="">None</option>
+                ${tasks
+                    .filter(t => t.id !== task.id) // cannot depend on self
+                    .map(t => `<option value="${t.id}">${t.id}</option>`).join("")}
+            </select>
+        `;
+        dependencyContainer.appendChild(div);
+    });
+}
+
+// Load tasks and render dependency options
+async function loadDependencyOptions() {
+    try {
+        const res = await fetch(`${API_URL}/tasks`);
+        const tasks = await res.json();
+        renderDependencyOptions(tasks);
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+// Save dependencies
+saveDependenciesBtn.addEventListener("click", async () => {
+    const selects = document.querySelectorAll("#dependency-container select");
+    const updates = [];
+
+    selects.forEach(sel => {
+        const taskId = sel.dataset.taskId;
+        const depId = sel.value || null;
+        updates.push({ id: taskId, dependency: depId });
+    });
+
+    try {
+        const res = await fetch(`${API_URL}/update_dependencies`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ updates })
+        });
+        const data = await res.json();
+        renderTasks(data.tasks);
+        loadSortedTasks();
+    } catch (err) {
+        console.error(err);
     }
 });
 
