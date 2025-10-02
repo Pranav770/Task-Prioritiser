@@ -1,62 +1,70 @@
+from collections import deque
 from datetime import datetime
-from collections import deque, defaultdict
 
-def run_hybrid_prioritization(tasks):
-    """
-    Hybrid task prioritization using BFS-based topological sort (Kahn's Algorithm).
-    
-    Steps:
-    1. Build in-degree map and adjacency list (task dependencies).
-    2. Initialize a queue with tasks having no prerequisites.
-    3. Process tasks in BFS order:
-        - At each step, choose the highest scoring task from the current queue.
-        - Append it to the result.
-        - Reduce the in-degree of its neighbors.
-        - If any neighbor's in-degree hits 0, enqueue it.
-    4. Return the prioritized task order.
-    """
+def constructAdj(V, edges):
+    adj = [[] for _ in range(V)]
+    for u, v in edges:
+        adj[u].append(v)
+    return adj
 
-    # Map task_id -> task dictionary
-    task_map = {task["id"]: task for task in tasks}
+def topologicalSort(V, edges, tasks):
+    adj = constructAdj(V, edges)
+    indegree = [0] * V
 
-    # Build graph and in-degree map
-    in_degree = {task["id"]: 0 for task in tasks}
-    graph = defaultdict(list)
+    # Calculate indegree of each vertex
+    for u in range(V):
+        for v in adj[u]:
+            indegree[v] += 1
 
-    for task in tasks:
-        for prereq in task["prerequisites"]:
-            graph[prereq].append(task["id"])
-            in_degree[task["id"]] += 1
+    # Custom comparator: sort by priority first, then by due date
+    def task_sort_key(idx):
+        priority = tasks[idx].get("priority", 0)
+        due_date_str = tasks[idx].get("DueDate")
+        due_date = datetime.strptime(due_date_str, "%d/%m/%Y").date() if due_date_str else datetime.max.date()
+        return (-priority, due_date)  # higher priority first, earlier due date first
 
-    # Function to compute hybrid score
-    def compute_score(task):
-        importance = task["importance"]
-        due_date = datetime.strptime(task["due_date"], "%Y-%m-%d").date()
-        today = datetime.today().date()
-        days_until_due = max((due_date - today).days, 0)  # no negatives
-        return (importance * 10) + (100 - days_until_due)
+    # Start with tasks that have indegree 0
+    ready = [i for i in range(V) if indegree[i] == 0]
+    ready.sort(key=task_sort_key)  # sort initially
 
-    # Initialize BFS queue with tasks having no prerequisites
-    queue = deque([tid for tid, deg in in_degree.items() if deg == 0])
     result = []
+    while ready:
+        node = ready.pop(0)  # pick best task (highest priority, earliest deadline)
+        result.append(node)
 
-    while queue:
-        # Get all available tasks in the current "frontier"
-        current_level = [task_map[tid] for tid in list(queue)]
-        queue.clear()
+        for neighbor in adj[node]:
+            indegree[neighbor] -= 1
+            if indegree[neighbor] == 0:
+                ready.append(neighbor)
 
-        # Pick the task with the highest score
-        best_task = max(current_level, key=compute_score)
-        result.append(best_task)
+        # Re-sort available tasks after each insertion
+        ready.sort(key=task_sort_key)
 
-        # Process only the chosen best task
-        for neighbor in graph[best_task["id"]]:
-            in_degree[neighbor] -= 1
-            if in_degree[neighbor] == 0:
-                queue.append(neighbor)
-
-    # Optional: cycle detection (if not all tasks are processed)
-    if len(result) != len(tasks):
-        raise ValueError("Cycle detected in task dependencies!")
+    if len(result) != V:
+        print("⚠️ Graph contains cycle (circular dependency detected)!")
+        return []
 
     return result
+
+# ✅ Function to run with your tasks.json
+def run_topological_sort(tasks):
+    id_to_index = {task["id"]: idx for idx, task in enumerate(tasks)}
+    index_to_task = {idx: task for idx, task in enumerate(tasks)}
+
+    edges = []
+    for task in tasks:
+        if task.get("dependency"):
+            dep_id = task["dependency"]
+            if dep_id in id_to_index:
+                edges.append([id_to_index[dep_id], id_to_index[task["id"]]])
+
+    order = topologicalSort(len(tasks), edges, tasks)
+
+    sorted_tasks = []
+    for idx in order:
+        task = index_to_task[idx].copy()
+        task.pop("id", None)
+        task.pop("dependency", None)
+        sorted_tasks.append(task)
+
+    return sorted_tasks
