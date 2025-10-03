@@ -3,7 +3,9 @@ const taskInput2 = document.getElementById("taskInput2");
 const taskInput3 = document.getElementById("taskInput3");
 const addBtn = document.getElementById("addBtn");
 const taskList = document.getElementById("taskList");
-const sortedTaskList = document.getElementById("sortedTaskList"); // new sorted output
+const sortedTaskList = document.getElementById("sortedTaskList");
+const dependencyContainer = document.getElementById("dependency-container");
+const saveDependenciesBtn = document.getElementById("saveDependencies");
 
 // Backend API URL
 const API_URL = "http://127.0.0.1:8000";
@@ -15,13 +17,12 @@ function renderTasks(tasks) {
         const li = document.createElement("li");
 
         const taskText = document.createElement("span");
-        taskText.textContent = `${t.task} (Priority: ${t.priority}) Due Date: ${t.DueDate}`;
+        taskText.textContent = `${t.task} (Priority: ${t.priority}) Due Date: ${t.DueDate || "N/A"}`;
 
         const removeBtn = document.createElement("button");
         removeBtn.textContent = "❌";
         removeBtn.classList.add("removeBtn");
 
-        // Delete handler
         removeBtn.addEventListener("click", async () => {
             try {
                 const res = await fetch(`${API_URL}/delete_task`, {
@@ -31,7 +32,8 @@ function renderTasks(tasks) {
                 });
                 const data = await res.json();
                 renderTasks(data.tasks);
-                loadSortedTasks(); // refresh sorted output after deletion
+                renderDependencyOptions(data.tasks);
+                loadSortedTasks();
             } catch (err) {
                 console.error("Error deleting task:", err);
             }
@@ -48,7 +50,7 @@ function renderSortedTasks(tasks) {
     sortedTaskList.innerHTML = "";
     tasks.forEach((t, index) => {
         const li = document.createElement("li");
-        li.textContent = `${index + 1}. ${t.task} (Priority: ${t.priority}) Due: ${t.DueDate}`;
+        li.textContent = `${index + 1}. ${t.task} (Priority: ${t.priority}) Due: ${t.DueDate || "N/A"}`;
         sortedTaskList.appendChild(li);
     });
 }
@@ -60,6 +62,7 @@ async function loadTasks() {
         if (!res.ok) throw new Error("Failed to fetch tasks");
         const tasks = await res.json();
         renderTasks(tasks);
+        renderDependencyOptions(tasks);
     } catch (err) {
         console.error(err);
         taskList.innerHTML = "<li>Error loading tasks</li>";
@@ -84,7 +87,11 @@ addBtn.addEventListener("click", async () => {
     const task1 = taskInput1.value.trim();
     let task2 = parseInt(taskInput2.value.trim()) || 1;
     let task3 = taskInput3.value.trim();
-    let task4 = taskInput4.value.trim();
+    let dueDate = "";
+    if (task3) {
+        const [year, month, day] = task3.split("-");
+        dueDate = `${day}/${month}/${year}`;
+    }
     task2 = Math.min(Math.max(task2, 1), 10);
 
     if (task1 !== "") {
@@ -92,22 +99,21 @@ addBtn.addEventListener("click", async () => {
             const res = await fetch(`${API_URL}/add_task`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    task: task1, 
+                body: JSON.stringify({
+                    task: task1,
                     priority: task2,
-                    DueDate: task3,
-                    dependency: task4 
+                    DueDate: dueDate
                 })
             });
             const data = await res.json();
             renderTasks(data.tasks);
-            loadSortedTasks(); // refresh sorted output immediately
+            renderDependencyOptions(data.tasks);
+            loadSortedTasks();
 
-            // clear inputs
+            // Clear inputs
             taskInput1.value = "";
             taskInput2.value = "";
             taskInput3.value = "";
-            taskInput4.value = "";
         } catch (err) {
             console.error(err);
         }
@@ -115,7 +121,7 @@ addBtn.addEventListener("click", async () => {
 });
 
 // Render dependency dropdowns for each task
-async function renderDependencyOptions(tasks) {
+function renderDependencyOptions(tasks) {
     dependencyContainer.innerHTML = "";
     tasks.forEach(task => {
         const div = document.createElement("div");
@@ -125,23 +131,12 @@ async function renderDependencyOptions(tasks) {
             <select data-task-id="${task.id}">
                 <option value="">None</option>
                 ${tasks
-                    .filter(t => t.id !== task.id) // cannot depend on self
-                    .map(t => `<option value="${t.id}">${t.id}</option>`).join("")}
+                    .filter(t => t.id !== task.id)
+                    .map(t => `<option value="${t.id}" ${t.id === task.dependency ? "selected" : ""}>${t.id}</option>`).join("")}
             </select>
         `;
         dependencyContainer.appendChild(div);
     });
-}
-
-// Load tasks and render dependency options
-async function loadDependencyOptions() {
-    try {
-        const res = await fetch(`${API_URL}/tasks`);
-        const tasks = await res.json();
-        renderDependencyOptions(tasks);
-    } catch (err) {
-        console.error(err);
-    }
 }
 
 // Save dependencies
@@ -163,6 +158,7 @@ saveDependenciesBtn.addEventListener("click", async () => {
         });
         const data = await res.json();
         renderTasks(data.tasks);
+        renderDependencyOptions(data.tasks);
         loadSortedTasks();
     } catch (err) {
         console.error(err);
