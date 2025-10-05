@@ -1,5 +1,5 @@
 # Task-Prioritiser
-Task-Sensi implementation using bfs/dfs and A* algorithm
+Task-Sensi implementation using Topological Sort (bfs)
 
 ✨ Key Features
 1. Dependency Management: Models tasks and their prerequisites as a Directed Acyclic Graph (DAG) to ensure a valid workflow.
