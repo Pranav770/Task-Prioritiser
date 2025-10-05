@@ -53,10 +53,13 @@ def run_topological_sort(tasks):
 
     edges = []
     for task in tasks:
-        if task.get("dependency"):
-            dep_id = task["dependency"]
+        deps = task.get("dependency", [])
+        if isinstance(deps, str):  # in case it's a single dependency
+            deps = [deps]
+        for dep_id in deps:
             if dep_id in id_to_index:
                 edges.append([id_to_index[dep_id], id_to_index[task["id"]]])
+
 
     order = topologicalSort(len(tasks), edges, tasks)
 
@@ -66,5 +69,6 @@ def run_topological_sort(tasks):
         task.pop("id", None)
         task.pop("dependency", None)
         sorted_tasks.append(task)
+
 
     return sorted_tasks

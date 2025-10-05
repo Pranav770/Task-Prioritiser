@@ -1,1 +1,44 @@
-[]
+[
+    {
+        "task": "Design Mockups",
+        "priority": 8,
+        "DueDate": "10/10/2025",
+        "dependency": [],
+        "id": "T1"
+    },
+    {
+        "task": "Develop Frontend",
+        "priority": 7,
+        "DueDate": "15/10/2025",
+        "dependency": [
+            "T1"
+        ],
+        "id": "T2"
+    },
+    {
+        "task": "Develop Backend API",
+        "priority": 9,
+        "DueDate": "12/10/2025",
+        "dependency": [],
+        "id": "T3"
+    },
+    {
+        "task": "Integrate Frontend & Backend",
+        "priority": 6,
+        "DueDate": "20/10/2025",
+        "dependency": [
+            "T2",
+            "T3"
+        ],
+        "id": "T4"
+    },
+    {
+        "task": "Deploy to Production",
+        "priority": 10,
+        "DueDate": "25/10/2025",
+        "dependency": [
+            "T4"
+        ],
+        "id": "T5"
+    }
+]

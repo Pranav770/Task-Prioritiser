@@ -88,7 +88,11 @@ def update_dependencies(data: dict):
     for u in updates:
         for task in tasks:
             if task["id"] == u["id"]:
-                task["dependency"] = u.get("dependency")  # can be None
+                deps = u.get("dependency", [])
+                if isinstance(deps, str):  # convert single string to list
+                    deps = [deps]
+                task["dependency"] = deps
+
 
     save_tasks(tasks)
     return {"tasks": tasks}

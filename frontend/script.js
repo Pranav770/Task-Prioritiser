@@ -6,13 +6,15 @@ const taskList = document.getElementById("taskList");
 const sortedTaskList = document.getElementById("sortedTaskList");
 const dependencyContainer = document.getElementById("dependency-container");
 const saveDependenciesBtn = document.getElementById("saveDependencies");
+const sortBtn = document.getElementById("sortBtn");
+
 
 // Backend API URL
 const API_URL = "http://127.0.0.1:8000";
 
 // Render normal tasks
 function renderTasks(tasks) {
-    taskList.innerHTML = "";
+    taskList.innerHTML = "";    
     tasks.forEach(t => {
         const li = document.createElement("li");
 
@@ -33,7 +35,7 @@ function renderTasks(tasks) {
                 const data = await res.json();
                 renderTasks(data.tasks);
                 renderDependencyOptions(data.tasks);
-                loadSortedTasks();
+                
             } catch (err) {
                 console.error("Error deleting task:", err);
             }
@@ -108,7 +110,7 @@ addBtn.addEventListener("click", async () => {
             const data = await res.json();
             renderTasks(data.tasks);
             renderDependencyOptions(data.tasks);
-            loadSortedTasks();
+            
 
             // Clear inputs
             taskInput1.value = "";
@@ -126,13 +128,21 @@ function renderDependencyOptions(tasks) {
     tasks.forEach(task => {
         const div = document.createElement("div");
         div.style.marginBottom = "10px";
+
         div.innerHTML = `
             <label>${task.id} depends on:</label>
-            <select data-task-id="${task.id}">
-                <option value="">None</option>
+            <select data-task-id="${task.id}" multiple>
                 ${tasks
                     .filter(t => t.id !== task.id)
-                    .map(t => `<option value="${t.id}" ${t.id === task.dependency ? "selected" : ""}>${t.id}</option>`).join("")}
+                    .map(t => `
+                        <option value="${t.id}" ${
+                            Array.isArray(task.dependency) && task.dependency.includes(t.id)
+                                ? "selected"
+                                : ""
+                        }>
+                            ${t.id}
+                        </option>
+                    `).join("")}
             </select>
         `;
         dependencyContainer.appendChild(div);
@@ -146,8 +156,12 @@ saveDependenciesBtn.addEventListener("click", async () => {
 
     selects.forEach(sel => {
         const taskId = sel.dataset.taskId;
-        const depId = sel.value || null;
-        updates.push({ id: taskId, dependency: depId });
+        const selectedOptions = Array.from(sel.selectedOptions).map(opt => opt.value);
+updates.push({
+    id: taskId,
+    dependency: selectedOptions.length > 0 ? selectedOptions : []
+});
+
     });
 
     try {
@@ -159,12 +173,17 @@ saveDependenciesBtn.addEventListener("click", async () => {
         const data = await res.json();
         renderTasks(data.tasks);
         renderDependencyOptions(data.tasks);
-        loadSortedTasks();
+        
     } catch (err) {
         console.error(err);
     }
 });
 
+    // Show sorted tasks only when button is clicked
+    sortBtn.addEventListener("click", () => {
+    loadSortedTasks();
+    });
+
 // Load everything on page start
 loadTasks();
-loadSortedTasks();
+

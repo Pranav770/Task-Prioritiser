@@ -17,6 +17,7 @@ body {
     text-align: center;
     font-size: 100px;
     margin: 30px 0;
+    text-shadow: 0px 0px 6px #ce8a17;
 }
 
 #container {
@@ -114,9 +115,9 @@ input[type="text"], input[type="number"], input[type="date"] {
 
 #Sorted-Output h2 {
     font-size: 45px;
-    color: #ffd369;
+    color: #ce8a17;
     margin-bottom: 20px;
-    text-shadow: 0px 0px 8px #ce8a17;
+    
 }
 
 #sortedTaskList {
@@ -165,15 +166,15 @@ input[type="text"], input[type="number"], input[type="date"] {
     width: 85%;
     min-width: 300px;
     text-align: left;
-    box-shadow: 0px 0px 12px rgba(206, 138, 23, 0.5);
+    
 }
 
 /* Subtitle for dependency section */
 #dependency-section h2#Sub_title {
     font-size: 36px;
-    color: #ffd369;
+    color: #ce8a17;
     margin-bottom: 15px;
-    text-shadow: 0px 0px 6px #ce8a17;
+    
 }
 
 /* Each dependency row */
@@ -198,8 +199,8 @@ input[type="text"], input[type="number"], input[type="date"] {
     font-size: 18px;
     border-radius: 8px;
     border: none;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
+    background: white;
+    color: black;
     min-width: 150px;
 }
 
@@ -208,7 +209,7 @@ input[type="text"], input[type="number"], input[type="date"] {
     margin-top: 10px;
     font-size: 20px;
     padding: 10px 20px;
-    background-color: #ffd369;
+    background-color: #ce8a17;
     color: #000;
     font-weight: bold;
     border: none;
