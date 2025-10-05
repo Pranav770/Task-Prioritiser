@@ -10,7 +10,7 @@ const sortBtn = document.getElementById("sortBtn");
 
 
 // Backend API URL
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://task-prioritiser-api.onrender.com";
 
 // Render normal tasks
 function renderTasks(tasks) {
